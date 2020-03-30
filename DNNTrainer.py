@@ -50,7 +50,7 @@ def predict(inputData: list) -> list:
 if __name__ == "__main__":
     train()
 
-    data = sdm.getData("GOOG")
+    data = sdm.getData("TEVA")
     closeValues = data["c"]
     inputRange = 7
     outputRange = 1
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     
     for i in range(len(inputData)):
         predictedOutputs.append(float(predict(inputData[i])))
-        if i < 5:
+        if i < 10:
             print("The predicted output is {}, while the true output is {}".format(predictedOutputs[i], outputData[i]))
 
     plt.plot(outputData)
