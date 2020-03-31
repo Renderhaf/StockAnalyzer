@@ -2,13 +2,17 @@ import StockDataManager as sd
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import random
 
 companiesToAnalyze = ['AAPL', 'GOOGL', 'TSLA', 'INTC', 'AMZN',
-                     'AMD', 'BTC-USD', 'MDB', 'GM', 'DELL', 
+                     'AMD','MDB', 'GM', 'DELL', 
                      'ABT', 'EBAY', 'HPQ', 'KEYS', 'NFLX',
                      'MMM', 'ADBE', 'A', 'T', 'AXP',
                      'ACN', 'AKAM', 'CDW', 'CSCO', 'FLIR',
-                     'IT', 'GPN', 'HPE', 'IBM', 'MA']
+                     'IT', 'GPN', 'HPE', 'IBM', 'MA',
+                     'ADSK','BKR','BLK','AVGO','ARNC',
+                     'BBY','BA','EQIX','ES','HAL',
+                     'GPN','HD','LB','MCD']
 
 def splitIntoChunks(stockName, inputRange: int=7, outputRange:int=1):
     data = sd.getData(stockName)
@@ -21,7 +25,6 @@ def splitIntoChunks(stockName, inputRange: int=7, outputRange:int=1):
 
     return inputVals, outputVals
 
-
 def makeLearningData(comapnies: list):
     inputDatas = []
     outputDatas = []
@@ -31,7 +34,18 @@ def makeLearningData(comapnies: list):
         inputDatas.extend(inputData)
         outputDatas.extend(outputData)
     
+    #Shuffle the data
+    indexlist = list(range(len(inputDatas)))
+    random.shuffle(indexlist)
+
+    newinput = []
+    newoutput = []
+    for i in indexlist:
+        newinput.append(inputDatas[i])
+        newoutput.append(outputDatas[i])
+
     return inputDatas, outputDatas
+    # return newinput, newoutput
 
 def saveLearningData(inputData:list, outputData:list)->None:
     data = {
@@ -43,7 +57,7 @@ def saveLearningData(inputData:list, outputData:list)->None:
 
 def test():
     inputData, outputData = makeLearningData(companiesToAnalyze)
-    print(len(inputData), len(outputData))
+    print(inputData[0], outputData[0])
     saveLearningData(inputData, outputData)
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ dataPath = "./data/"
 
 def saveStockData(stockName: str, yearsBack:float=3):
     currentYear = int(time.asctime().split(" ")[-1])
-    df = web.DataReader(stockName, "yahoo", start=dt.datetime(currentYear - yearsBack, 3, 30))
+    df = web.DataReader(stockName, "yahoo", start=dt.datetime(currentYear - yearsBack, 1, 1), end=dt.datetime(currentYear, 1, 1))
     df.to_csv(dataPath + stockName + ".csv")
 
 def test():
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     # colors = ['r', 'g', 'b', 'cyan', 'lime', 'magenta']
     # plotStocks(companies)
     # test()
-    # saveStockData("GOOG")
+    saveStockData("GOOG")

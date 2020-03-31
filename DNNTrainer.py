@@ -18,14 +18,15 @@ def enlarge(data: list, index: int=-1)->None:
             data[index][i] = mapp(data[index][i], 0.4, 0.6, 0, 1)
 
 
-learner = sdl(activationFunction="softmax")
+learner = sdl(activationFunction="sigmoid", hiddenLayersFunction="relu")
 
 def train():
     with open("LearningData.json", "r") as file:
         data = json.loads(file.read())
 
-    inputdata = np.asarray(data["input"])
-    outputdata = np.asarray(data["output"])
+    start = 4000
+    inputdata = np.asarray(data["input"][start:])
+    outputdata = np.asarray(data["output"][start:])
 
     for i in range(len(inputdata)):
         divisor = (inputdata[i][0]*2)
@@ -44,25 +45,15 @@ def predict(inputData: list) -> list:
     enlarge(newInputData)
 
     predictedOutput = learner.predict(newInputData)
-    predictedOutput[0][0] *= divisor
-    return predictedOutput[0][0]
+    predictedOutput = predictedOutput[0][0]
+    predictedOutput *= divisor
+
+    return predictedOutput
 
 if __name__ == "__main__":
     train()
 
-    data = sdm.getData("TEVA")
-    closeValues = data["c"]
-    inputRange = 7
-    outputRange = 1
-    inputData = []
-    outputData = []
-
-    for location in range(0, len(closeValues)-inputRange-outputRange):
-        inputData.append(closeValues[location:location+inputRange])
-        outputData.extend(closeValues[location+inputRange:location+inputRange+outputRange])
-
-    inputData = np.asarray(inputData)
-    outputData = np.asarray(outputData)
+    inputData, outputData = sda.splitIntoChunks("GOOGL")
     
     print("Input len: {}, Output len: {}, first Input: {}, first output: {}".format(len(inputData), len(outputData), inputData[0], outputData[0]))
     predictedOutputs = []
