@@ -27,11 +27,11 @@ def unEnlarge(data: list, index: int=-1)->None:
 
 learner = sdl(activationFunction="sigmoid", hiddenLayersFunction="relu")
 
-def train():
+def train(epochs = 10):
     with open("LearningData.json", "r") as file:
         data = json.loads(file.read())
 
-    start = 4000
+    start = 0
     inputdata = np.asarray(data["input"][start:])
     outputdata = np.asarray(data["output"][start:])
 
@@ -43,7 +43,7 @@ def train():
         enlarge(inputdata, i)
         enlarge(outputdata, i)
 
-    learner.train(inputdata, outputdata, 10)
+    learner.train(inputdata, outputdata, epochs)
 
 def predict(inputData: list) -> list:
     newInputData = np.asarray([inputData])
@@ -58,11 +58,8 @@ def predict(inputData: list) -> list:
 
     return predictedOutput
 
-if __name__ == "__main__":
-    train()
 
-    inputData, outputData = sda.splitIntoChunks("GOOG")
-    
+def plotPredictions(inputData, outputData, show=True):
     lastInputs = [x[-1] for x in inputData]
 
     print("Input len: {}, Output len: {}, first Input: {}, first output: {}".format(len(inputData), len(outputData), inputData[0], outputData[0]))
@@ -87,10 +84,46 @@ if __name__ == "__main__":
 
     print("Diff match precentage is {}.".format((match/count)*100))
 
-    plt.plot(outputData)
-    plt.plot(predictedOutputs)
-    plt.legend(["Real Outputs", "Predicted Outputs"])
+    if show:
+        plt.plot(outputData)
+        plt.plot(predictedOutputs)
+        plt.legend(["Real Outputs", "Predicted Outputs"])
+        plt.show()
+
+
+def predictMax(inputData, outputData):
+    predictionData = inputData[0]
+
+    for i in range(len(inputData)): 
+        workData = predictionData[i:i+7]
+        prediction = float(predict(workData))
+
+        if i < 10:
+            print(str(workData) + " ---> " + str(prediction))
+
+        predictionData.append(prediction)
+
+    plt.plot(predictionData)
     plt.show()
+
+
+def test():
+    isNewModel = True
+    isTrain = True
+    
+    if isTrain:
+        if isNewModel:
+            train(epochs = 10)
+            learner.save()
+        else:
+            learner.load()
+
+    inputData, outputData = sda.splitIntoChunks("GOOG")
+    plotPredictions(inputData, outputData, show=True)
+
+if __name__ == "__main__":
+    test()
+    
 
 
     
