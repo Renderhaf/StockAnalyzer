@@ -17,6 +17,13 @@ def enlarge(data: list, index: int=-1)->None:
         for i in range(len(data[index])):
             data[index][i] = mapp(data[index][i], 0.4, 0.6, 0, 1)
 
+def unEnlarge(data: list, index: int=-1)->None:
+    if index==-1:
+        for i in range(len(data)):
+            data[i] = mapp(data[i], 0, 1, 0.4, 0.6)
+    else:
+        for i in range(len(data[index])):
+            data[index][i] = mapp(data[index][i], 0, 1, 0.4, 0.6)
 
 learner = sdl(activationFunction="sigmoid", hiddenLayersFunction="relu")
 
@@ -45,6 +52,7 @@ def predict(inputData: list) -> list:
     enlarge(newInputData)
 
     predictedOutput = learner.predict(newInputData)
+    unEnlarge(predictedOutput[0])
     predictedOutput = predictedOutput[0][0]
     predictedOutput *= divisor
 
@@ -53,15 +61,31 @@ def predict(inputData: list) -> list:
 if __name__ == "__main__":
     train()
 
-    inputData, outputData = sda.splitIntoChunks("GOOGL")
+    inputData, outputData = sda.splitIntoChunks("GOOG")
     
+    lastInputs = [x[-1] for x in inputData]
+
     print("Input len: {}, Output len: {}, first Input: {}, first output: {}".format(len(inputData), len(outputData), inputData[0], outputData[0]))
     predictedOutputs = []
     
     for i in range(len(inputData)):
         predictedOutputs.append(float(predict(inputData[i])))
-        if i < 10:
-            print("The predicted output is {}, while the true output is {}".format(predictedOutputs[i], outputData[i]))
+        # if i < 10:
+        #     print("The predicted output is {}, while the true output is {}".format(predictedOutputs[i], outputData[i]))
+
+    match = 0
+    count = 0
+
+    for lastVal, predicted, real in zip(lastInputs, predictedOutputs, outputData):
+        realDiff = real[0] - lastVal
+        preDiff = predicted - lastVal
+
+        if (realDiff > 0 and preDiff > 0)  or (realDiff < 0 and preDiff < 0):
+            match += 1
+        
+        count += 1
+
+    print("Diff match precentage is {}.".format((match/count)*100))
 
     plt.plot(outputData)
     plt.plot(predictedOutputs)
